@@ -45,7 +45,6 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         super.onAttach(view)
         presenter = DeeplinkListPresenter(this)
         presenter.onAttach()
-
     }
 
     override fun onDestroyView(view: View) {
@@ -74,10 +73,8 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         adapter?.deepLinkList = deepLinkList
         adapter?.notifyDataSetChanged()
     }
-    //endregion
 
-    //region Private Helpers
-    private fun openAddDeepLinkActivity() {
+    override fun openAddDeepLinkActivity() {
         activity?.let {
             startActivity(AddDeepLinkActivity.createIntent(it))
         }

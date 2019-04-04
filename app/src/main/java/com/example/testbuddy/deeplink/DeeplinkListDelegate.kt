@@ -9,4 +9,5 @@ interface DeeplinkListDelegate {
     fun placeHolder()
     fun <T : ViewModel> getViewModel(clazz: Class<T>): ViewModel
     fun updateDeepLinkList(deepLinkList: ArrayList<DeeplinkModel>)
+    fun openAddDeepLinkActivity()
 }
