@@ -2,8 +2,10 @@ package com.example.testbuddy.deeplink
 
 import androidx.lifecycle.ViewModel
 import com.example.testbuddy.deeplink.db.DeeplinkModel
+import io.reactivex.Single
 import java.util.ArrayList
 
 class DeeplinkViewModel : ViewModel() {
-    var deeplinkList: ArrayList<DeeplinkModel> = ArrayList()
+    var deeplinkList: List<DeeplinkModel>? = null
+    var getDeepLinkListSingle: Single<List<DeeplinkModel>>? = null
 }

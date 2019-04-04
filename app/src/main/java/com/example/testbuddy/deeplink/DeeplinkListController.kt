@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bluelinelabs.conductor.Controller
 import com.example.testbuddy.R
 import com.example.testbuddy.deeplink.adddeeplink.AddDeepLinkActivity
+import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.utils.createClickListenerObservable
 import io.reactivex.disposables.Disposable
@@ -43,8 +44,10 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        presenter = DeeplinkListPresenter(this)
-        presenter.onAttach()
+        applicationContext?.let {
+            presenter = DeeplinkListPresenter(this, DeepLinkDatabase.get(it))
+            presenter.onAttach()
+        }
     }
 
     override fun onDestroyView(view: View) {
@@ -69,7 +72,7 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         }
     }
 
-    override fun updateDeepLinkList(deepLinkList: ArrayList<DeeplinkModel>) {
+    override fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>) {
         adapter?.deepLinkList = deepLinkList
         adapter?.notifyDataSetChanged()
     }

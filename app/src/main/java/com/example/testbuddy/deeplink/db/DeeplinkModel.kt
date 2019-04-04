@@ -4,7 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "deep_link")
-class DeeplinkModel constructor(
-    @PrimaryKey var id: String = "",
-    var url: String? = null,
-    var description: String? = null)
+data class DeeplinkModel constructor(
+    @PrimaryKey var id: String,
+    var host: String,
+    var url: String,
+    var description: String?)
