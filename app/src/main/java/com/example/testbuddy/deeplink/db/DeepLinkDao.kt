@@ -14,6 +14,4 @@ interface DeepLinkDao {
 
     @Insert(onConflict = REPLACE)
     fun insertDeepLink(deeplinkModel: DeeplinkModel)
-
-
 }

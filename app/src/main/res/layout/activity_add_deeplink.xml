@@ -15,6 +15,7 @@
     />
 
     <EditText
+        android:id="@+id/addDeepLinkDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,11 +34,13 @@
         android:layout_marginBottom="10dp">
 
         <Button
+            android:id="@+id/addDeepLinkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Add DeepLink"/>
 
         <Button
+            android:id="@+id/addAndFireDeepLink"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Add and Fire DeepLink"/>
