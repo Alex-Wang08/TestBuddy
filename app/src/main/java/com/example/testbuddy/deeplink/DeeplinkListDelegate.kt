@@ -7,6 +7,6 @@ import java.util.ArrayList
 interface DeeplinkListDelegate {
     fun placeHolder()
     fun <T : ViewModel> getViewModel(clazz: Class<T>): ViewModel
-    fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>)
-    fun openAddDeepLinkActivity()
+    fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?)
+    fun openAddDeepLinkActivity(requestCode: Int)
 }

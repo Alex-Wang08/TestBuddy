@@ -1,6 +1,7 @@
 package com.example.testbuddy.deeplink
 
 import android.app.Application
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.example.testbuddy.R
 import com.example.testbuddy.deeplink.adddeeplink.AddDeepLinkActivity
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
+import com.example.testbuddy.utils.RequestCode
 import com.example.testbuddy.utils.createClickListenerObservable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
@@ -37,7 +39,7 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
             deepLinkList.layoutManager = layoutManager
             deepLinkList.adapter = adapter
 
-            disposable = deepLinkAddDeepLink.createClickListenerObservable().subscribe { openAddDeepLinkActivity() }
+            disposable = deepLinkAddDeepLink.createClickListenerObservable().subscribe { presenter.onAddDeepLinkClick() }
         }
         return view
     }
@@ -54,6 +56,12 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         super.onDestroyView(view)
         disposable?.dispose()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode, data)
+    }
+
     //endregion
 
     //region Delegate
@@ -72,14 +80,16 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         }
     }
 
-    override fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>) {
-        adapter?.deepLinkList = deepLinkList
-        adapter?.notifyDataSetChanged()
+    override fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?) {
+        deepLinkList?.let {
+            adapter?.deepLinkList = it
+            adapter?.notifyDataSetChanged()
+        }
     }
 
-    override fun openAddDeepLinkActivity() {
+    override fun openAddDeepLinkActivity(requestCode: Int) {
         activity?.let {
-            startActivity(AddDeepLinkActivity.createIntent(it))
+            startActivityForResult(AddDeepLinkActivity.createIntent(it), requestCode)
         }
     }
     //endregion

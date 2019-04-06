@@ -1,7 +1,10 @@
 package com.example.testbuddy.deeplink
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
+import com.example.testbuddy.utils.RequestCode
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -21,33 +24,22 @@ class DeeplinkListPresenter constructor(
     //region Lifecycle
     fun onAttach() {
         updateDeepLinkList()
+    }
 
-        viewModel.deeplinkList?.let {
-            if (it.isNotEmpty()) {
-                delegate.updateDeepLinkList(it)
-                return
-            }
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == RequestCode.ADD_DEEP_LINK && resultCode == RESULT_OK) {
+            refreshDeepLinkList()
         }
+    }
+    //endregion
 
-        delegate.openAddDeepLinkActivity()
+    //region Clicks
+    fun onAddDeepLinkClick() {
+        delegate.openAddDeepLinkActivity(RequestCode.ADD_DEEP_LINK)
     }
     //endregion
 
     //region Private Helpers
-    private fun initializeDeepLinkList() {
-        val deepLinkList = ArrayList<DeeplinkModel>()
-        val url = "gasbuddy://settings"
-        val host = url.split(":").first()
-
-        val settingsDeepLink = DeeplinkModel(
-            id = UUID.randomUUID().toString(),
-            host = host,
-            url = url,
-            description = "open settings screen")
-        deepLinkList.add(settingsDeepLink)
-        viewModel.deeplinkList = deepLinkList
-    }
-
     private fun getDeepLinksFromDb(): Single<List<DeeplinkModel>> =
             deepLinkDatabase.deepLinkDao()
                 .getDeepLinkList()
@@ -66,17 +58,40 @@ class DeeplinkListPresenter constructor(
                 ?.subscribe(
                     {
                         viewModel.deeplinkList = it
+                        if (it.isEmpty()) {
+                            delegate.openAddDeepLinkActivity(RequestCode.ADD_DEEP_LINK)
+                        } else {
+                            delegate.updateDeepLinkList(it)
+                        }
+
                         disposable?.dispose()
                     },
                     {
                         disposable?.dispose()
                     }
                 )
+        } else {
+            delegate.updateDeepLinkList(viewModel.deeplinkList)
+        }
+    }
+
+    private fun refreshDeepLinkList() {
+        if (viewModel.getDeepLinkListSingle == null) {
+            viewModel.getDeepLinkListSingle = getDeepLinksFromDb()
         }
 
-        if (viewModel.deeplinkList.isNullOrEmpty()) {
-            initializeDeepLinkList()
-        }
+        disposable = viewModel.getDeepLinkListSingle
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe(
+                {
+                    viewModel.deeplinkList = it
+                    delegate.updateDeepLinkList(it)
+                    disposable?.dispose()
+                },
+                {
+                    disposable?.dispose()
+                }
+            )
     }
     //endregion
 }

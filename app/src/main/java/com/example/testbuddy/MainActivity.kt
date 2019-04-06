@@ -1,14 +1,14 @@
 package com.example.testbuddy
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
+import com.example.testbuddy.base.BaseActivity
 import com.example.testbuddy.deeplink.DeeplinkListController
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), MainDelegate {
+class MainActivity : BaseActivity(), MainDelegate {
 
     //region Variables
     private lateinit var presenter: MainPresenter
@@ -16,11 +16,10 @@ class MainActivity : AppCompatActivity(), MainDelegate {
     //endregion
 
     //region Lifecycle
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun getLayoutId(): Int = R.layout.activity_main
 
-        initializeRouter(savedInstanceState)
+    override fun initializeView() {
+        initializeRouter(bundle)
     }
     //endregion
 

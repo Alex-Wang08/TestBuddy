@@ -1,6 +1,9 @@
 package com.example.testbuddy.deeplink.adddeeplink
 
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import io.reactivex.Completable
@@ -10,7 +13,8 @@ import java.util.*
 
 class AddDeepLinkPresenter(
     private val delegate: AddDeepLinkDelegate,
-    private val database: DeepLinkDatabase
+    private val database: DeepLinkDatabase,
+    private val lifecycleOwner: LifecycleOwner
 ) : LifecycleObserver {
 
     //region Variables
@@ -19,13 +23,36 @@ class AddDeepLinkPresenter(
 
     //region Lifecycle
     init {
-
+        lifecycleOwner.lifecycle.addObserver(this)
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onCreate() {
+        initializeUrlText()
+        initializeDescriptionText()
+    }
+
+    private fun initializeUrlText() {
+        if (viewModel.deepLinkUrl.isNullOrEmpty()) return
+        delegate.updateUrlText(viewModel.deepLinkUrl)
+    }
+
+    private fun initializeDescriptionText() {
+        if (viewModel.deepLinkDescription.isNullOrEmpty()) return
+        delegate.updateDescriptionText(viewModel.deepLinkDescription)
+    }
 
     //endregion
 
-    //region Clicks
+    //region Listener
+    fun onUrlTextChanged(url: String) {
+        viewModel.deepLinkUrl = url
+    }
+
+    fun onDescriptionTextChanged(description: String) {
+        viewModel.deepLinkDescription = description
+    }
+
     fun onAddDeepLinkClick() {
         if (viewModel.deepLinkUrl.isNullOrEmpty()) {
             delegate.showDeepLinkEmptyToast()
@@ -59,6 +86,7 @@ class AddDeepLinkPresenter(
             viewModel.addDeepLinkCompletable
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe {
+                    delegate.setResultOk()
                     delegate.finish()
                 }
         }
