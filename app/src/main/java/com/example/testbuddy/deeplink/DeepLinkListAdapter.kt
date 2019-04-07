@@ -30,7 +30,7 @@ class DeepLinkListAdapter constructor(
     override fun onBindViewHolder(holder: DeepLinkRowViewHolder, position: Int) {
         (holder.itemView as? DeepLinkRow)?.apply {
             updateDeepLinkInfo(deepLinkList?.get(position))
-            if (position == deepLinkList?.size ?: 0 ) {
+            if (position == (deepLinkList?.size ?: 0) - 1) {
                 hideDivider()
             }
         }

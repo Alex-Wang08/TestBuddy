@@ -2,19 +2,20 @@ package com.example.testbuddy.deeplink
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import com.example.testbuddy.base.BasePresenter
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.utils.RequestCode
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 class DeeplinkListPresenter constructor(
     private val delegate: DeeplinkListDelegate,
     private val deepLinkDatabase: DeepLinkDatabase
-) {
+) : BasePresenter() {
 
     //region Variables
     private val viewModel: DeeplinkViewModel by lazy { delegate.getViewModel(DeeplinkViewModel::class.java) as DeeplinkViewModel }
@@ -22,7 +23,11 @@ class DeeplinkListPresenter constructor(
     //endregion
 
     //region Lifecycle
-    fun onAttach() {
+    override fun onReattach() {
+
+    }
+
+    override fun onInitialAttach() {
         updateDeepLinkList()
     }
 
@@ -47,17 +52,34 @@ class DeeplinkListPresenter constructor(
     fun onUndoClick() {
         viewModel.swipedItem?.let {
             delegate.restoreItem(viewModel.swipedItemPosition, it)
+            viewModel.isDeleteUndone = true
+        }
+    }
+
+    fun onSnackbarDismissed() {
+        if (!viewModel.isDeleteUndone) {
+            deleteDeepLinkFromDb()
+            viewModel.isDeleteUndone = false
         }
     }
     //endregion
 
     //region Private Helpers
-    private fun getDeepLinksFromDb(): Single<List<DeeplinkModel>> =
-            deepLinkDatabase.deepLinkDao()
-                .getDeepLinkList()
-                .filter { it.isNotEmpty() }
-                .toSingle()
-                .subscribeOn(Schedulers.io())
+    private fun deleteDeepLinkFromDb() {
+        viewModel.swipedItem?.let {
+            if (viewModel.deleteDeepLinkCompletable == null) {
+                viewModel.deleteDeepLinkCompletable = Completable.fromAction {
+                    deepLinkDatabase.deepLinkDao().deleteDeepLink(it)
+                }.subscribeOn(Schedulers.io())
+            }
+
+            viewModel.deleteDeepLinkCompletable
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe {
+                    delegate.showDeepLinkDeleteToast()
+                }
+        }
+    }
 
     private fun updateDeepLinkList() {
         if (viewModel.deeplinkList.isNullOrEmpty()) {
@@ -105,5 +127,10 @@ class DeeplinkListPresenter constructor(
                 }
             )
     }
+
+    private fun getDeepLinksFromDb(): Single<List<DeeplinkModel>> =
+        deepLinkDatabase.deepLinkDao()
+            .getDeepLinkList()
+            .subscribeOn(Schedulers.io())
     //endregion
 }

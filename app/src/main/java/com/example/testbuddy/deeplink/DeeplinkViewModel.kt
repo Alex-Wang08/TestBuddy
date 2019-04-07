@@ -2,6 +2,7 @@ package com.example.testbuddy.deeplink
 
 import androidx.lifecycle.ViewModel
 import com.example.testbuddy.deeplink.db.DeeplinkModel
+import io.reactivex.Completable
 import io.reactivex.Single
 
 class DeeplinkViewModel : ViewModel() {
@@ -9,4 +10,7 @@ class DeeplinkViewModel : ViewModel() {
     var getDeepLinkListSingle: Single<List<DeeplinkModel>>? = null
     var swipedItemPosition: Int = 0
     var swipedItem: DeeplinkModel? = null
+    var isDeleteUndone = false
+
+    var deleteDeepLinkCompletable: Completable? = null
 }

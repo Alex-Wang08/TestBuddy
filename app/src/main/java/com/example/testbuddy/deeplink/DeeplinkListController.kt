@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bluelinelabs.conductor.Controller
 import com.example.testbuddy.R
+import com.example.testbuddy.base.BaseController
+import com.example.testbuddy.base.BasePresenter
 import com.example.testbuddy.deeplink.adddeeplink.AddDeepLinkActivity
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
@@ -28,13 +31,18 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
 import java.util.ArrayList
 
-class DeeplinkListController : Controller(), DeeplinkListDelegate {
+class DeeplinkListController : BaseController(), DeeplinkListDelegate {
 
     //region Variables
     private lateinit var presenter: DeeplinkListPresenter
     private var adapter: DeepLinkListAdapter? = null
     private var disposable: Disposable? = null
     private var snackBar: Snackbar? = null
+    private var snackBarDismissCallback = object : Snackbar.Callback() {
+        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+            presenter.onSnackbarDismissed()
+        }
+    }
     //endregion
 
     //region Lifecycle
@@ -45,6 +53,11 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
             initializeSnackbar(this as CoordinatorLayout)
             disposable = deepLinkAddDeepLink.createClickListenerObservable().subscribe { presenter.onAddDeepLinkClick() }
         }
+
+        applicationContext?.let {
+            presenter = DeeplinkListPresenter(this@DeeplinkListController, DeepLinkDatabase.get(it))
+        }
+
         return view
     }
 
@@ -67,9 +80,10 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
             setAction("UNDO") {
                 presenter.onUndoClick()
             }
-
             setActionTextColor(Color.YELLOW)
         }
+
+        snackBar?.addCallback(snackBarDismissCallback)
     }
 
     private fun createSwipeToDeleteCallback(): SwipeToDeleteCallback = object : SwipeToDeleteCallback() {
@@ -78,17 +92,10 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         }
     }
 
-    override fun onAttach(view: View) {
-        super.onAttach(view)
-        applicationContext?.let {
-            presenter = DeeplinkListPresenter(this, DeepLinkDatabase.get(it))
-            presenter.onAttach()
-        }
-    }
-
     override fun onDestroyView(view: View) {
         super.onDestroyView(view)
         disposable?.dispose()
+        snackBar?.removeCallback(snackBarDismissCallback)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,10 +106,6 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
     //endregion
 
     //region Delegate
-    override fun placeHolder() {
-
-    }
-
     override fun <T : ViewModel> getViewModel(clazz: Class<T>): ViewModel {
         if (activity is FragmentActivity) {
             return ViewModelProviders.of(activity as FragmentActivity).get(clazz)
@@ -135,5 +138,12 @@ class DeeplinkListController : Controller(), DeeplinkListDelegate {
         adapter?.restoreItem(position, swipedItem)
     }
 
+    override fun showDeepLinkDeleteToast() {
+        Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+    }
+    //endregion
+
+    //region BaseController
+    override fun getPresenter(): BasePresenter = presenter
     //endregion
 }
