@@ -37,6 +37,18 @@ class DeeplinkListPresenter constructor(
     fun onAddDeepLinkClick() {
         delegate.openAddDeepLinkActivity(RequestCode.ADD_DEEP_LINK)
     }
+
+    fun onItemSwiped(position: Int) {
+        viewModel.swipedItemPosition = position
+        viewModel.swipedItem = viewModel.deeplinkList?.get(position)
+        delegate.removeItem(position)
+    }
+
+    fun onUndoClick() {
+        viewModel.swipedItem?.let {
+            delegate.restoreItem(viewModel.swipedItemPosition, it)
+        }
+    }
     //endregion
 
     //region Private Helpers
