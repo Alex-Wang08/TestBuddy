@@ -4,10 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentActivity
@@ -17,21 +17,18 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bluelinelabs.conductor.Controller
 import com.example.testbuddy.R
 import com.example.testbuddy.base.BaseController
 import com.example.testbuddy.base.BasePresenter
 import com.example.testbuddy.deeplink.adddeeplink.AddDeepLinkActivity
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
-import com.example.testbuddy.utils.RequestCode
 import com.example.testbuddy.utils.createClickListenerObservable
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
-import java.util.ArrayList
 
-class DeeplinkListController : BaseController(), DeeplinkListDelegate {
+class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkListAdapter.Listener {
 
     //region Variables
     private lateinit var presenter: DeeplinkListPresenter
@@ -61,48 +58,28 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate {
         return view
     }
 
-    private fun initializeRecyclerView(recyclerView: RecyclerView, context: Context) {
-        adapter = DeepLinkListAdapter(context)
-        val layoutManager = LinearLayoutManager(context)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = adapter
-
-        val swipeToDeleteCallback = createSwipeToDeleteCallback()
-        ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
-    }
-
-    private fun initializeSnackbar(coordinatorLayout: CoordinatorLayout) {
-        snackBar = Snackbar.make(
-            coordinatorLayout,
-            "Item was removed from the list.",
-            Snackbar.LENGTH_LONG
-        ).apply {
-            setAction("UNDO") {
-                presenter.onUndoClick()
-            }
-            setActionTextColor(Color.YELLOW)
-        }
-
-        snackBar?.addCallback(snackBarDismissCallback)
-    }
-
-    private fun createSwipeToDeleteCallback(): SwipeToDeleteCallback = object : SwipeToDeleteCallback() {
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            presenter.onItemSwiped(viewHolder.adapterPosition)
-        }
-    }
-
     override fun onDestroyView(view: View) {
         super.onDestroyView(view)
         disposable?.dispose()
         snackBar?.removeCallback(snackBarDismissCallback)
+        adapter?.onDestroy()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presenter.onActivityResult(requestCode, resultCode, data)
     }
+    //endregion
 
+    //region Listener
+    override fun onDeepLinkRowClick(url: String?) {
+        activity?.let {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(url)
+            }
+            startActivity(intent)
+        }
+    }
     //endregion
 
     //region Delegate
@@ -145,5 +122,38 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate {
 
     //region BaseController
     override fun getPresenter(): BasePresenter = presenter
+    //endregion
+
+    //region Private Helpers
+    private fun initializeRecyclerView(recyclerView: RecyclerView, context: Context) {
+        adapter = DeepLinkListAdapter(context, this)
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = adapter
+
+        val swipeToDeleteCallback = createSwipeToDeleteCallback()
+        ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
+    }
+
+    private fun initializeSnackbar(coordinatorLayout: CoordinatorLayout) {
+        snackBar = Snackbar.make(
+            coordinatorLayout,
+            "Item was removed from the list.",
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction("UNDO") {
+                presenter.onUndoClick()
+            }
+            setActionTextColor(Color.YELLOW)
+        }
+
+        snackBar?.addCallback(snackBarDismissCallback)
+    }
+
+    private fun createSwipeToDeleteCallback(): SwipeToDeleteCallback = object : SwipeToDeleteCallback() {
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            presenter.onItemSwiped(viewHolder.adapterPosition)
+        }
+    }
     //endregion
 }

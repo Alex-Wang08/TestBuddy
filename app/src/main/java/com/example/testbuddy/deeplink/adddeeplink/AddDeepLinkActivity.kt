@@ -3,6 +3,7 @@ package com.example.testbuddy.deeplink.adddeeplink
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
@@ -84,6 +85,14 @@ class AddDeepLinkActivity : BaseActivity(), AddDeepLinkDelegate {
 
     override fun setResultOk() {
         setResult(Activity.RESULT_OK)
+    }
+
+    override fun openDeepLinkActivity(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(url)
+        }
+
+        startActivity(intent)
     }
     //endregion
 }

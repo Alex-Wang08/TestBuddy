@@ -14,6 +14,10 @@ fun View?.goneView() {
     this?.visibility = View.GONE
 }
 
+fun View?.visibleView() {
+    this?.visibility = View.VISIBLE
+}
+
 fun View.createClickListenerObservable(): Observable<Unit?> {
-    return this.clicks().throttleFirst(300L, TimeUnit.MILLISECONDS)
+    return this.clicks().throttleFirst(200L, TimeUnit.MILLISECONDS)
 }

@@ -9,4 +9,5 @@ interface AddDeepLinkDelegate {
     fun updateUrlText(url: String?)
     fun updateDescriptionText(description: String?)
     fun setResultOk()
+    fun openDeepLinkActivity(url: String)
 }

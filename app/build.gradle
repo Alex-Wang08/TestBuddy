@@ -37,10 +37,11 @@ dependencies {
     implementation 'com.bluelinelabs:conductor:3.0.0-rc1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha04'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.1.0-alpha04'
-    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
+    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha04'
 
     api 'io.reactivex.rxjava2:rxjava:2.2.3'
     implementation 'com.jakewharton.rxbinding3:rxbinding-material:3.0.0-alpha2'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
     def room_version = "2.1.0-alpha06"
     implementation "androidx.room:room-runtime:$room_version"

@@ -57,18 +57,21 @@ class AddDeepLinkPresenter(
         if (viewModel.deepLinkUrl.isNullOrEmpty()) {
             delegate.showDeepLinkEmptyToast()
         } else {
-            addDeepLinkToDb()
+            addDeepLinkToDb(false)
         }
     }
 
-
     fun onAddAndFireDeepLinkClick() {
-
+        if (viewModel.deepLinkUrl.isNullOrEmpty()) {
+            delegate.showDeepLinkEmptyToast()
+        } else {
+            addDeepLinkToDb(true)
+        }
     }
     //endregion
 
     //region Private Helpers
-    private fun addDeepLinkToDb() {
+    private fun addDeepLinkToDb(shouldFire: Boolean) {
         viewModel.deepLinkUrl?.let {
             val host = it.split(":").first()
             val deeplink = DeeplinkModel(
@@ -86,19 +89,14 @@ class AddDeepLinkPresenter(
             viewModel.addDeepLinkCompletable
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe {
+                    if (shouldFire) {
+                        delegate.openDeepLinkActivity(it)
+                    }
                     delegate.setResultOk()
                     delegate.finish()
+
                 }
         }
     }
-
-
     //endregion
-
-
-
-
-
-
-
 }

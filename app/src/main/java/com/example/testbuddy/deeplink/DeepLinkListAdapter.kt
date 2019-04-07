@@ -5,14 +5,25 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.deeplink.deeplinkrow.DeepLinkRow
+import com.example.testbuddy.utils.createClickListenerObservable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import java.util.ArrayList
 
 class DeepLinkListAdapter constructor(
-    private val context: Context
+    private val context: Context,
+    private var listener: Listener?
 ) : RecyclerView.Adapter<DeepLinkListAdapter.DeepLinkRowViewHolder>() {
 
+    //region Listener
+    interface Listener {
+        fun onDeepLinkRowClick(url: String?)
+    }
+    //endregion
+
     //region Variables
-    var deepLinkList: ArrayList<DeeplinkModel>? = null
+    private var deepLinkList: ArrayList<DeeplinkModel>? = null
+    private val compositeDisposable = CompositeDisposable()
     //endregion
 
     //region ViewHolder
@@ -32,7 +43,11 @@ class DeepLinkListAdapter constructor(
             updateDeepLinkInfo(deepLinkList?.get(position))
             if (position == (deepLinkList?.size ?: 0) - 1) {
                 hideDivider()
+            } else {
+                showDivider()
             }
+
+            createClickListenerObservable().subscribe { listener?.onDeepLinkRowClick(deepLinkList?.get(position)?.url) }.addTo(compositeDisposable)
         }
     }
     //endregion
@@ -51,6 +66,11 @@ class DeepLinkListAdapter constructor(
     fun restoreItem(position: Int, swipedItem: DeeplinkModel) {
         deepLinkList?.add(position, swipedItem)
         notifyDataSetChanged()
+    }
+
+    fun onDestroy() {
+        compositeDisposable.dispose()
+        listener = null
     }
     //endregion
 }
