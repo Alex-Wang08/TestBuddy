@@ -53,11 +53,6 @@ class DeepLinkListAdapter constructor(
     //endregion
 
     //region external operations
-    fun removeItem(position: Int) {
-        deepLinkList?.removeAt(position)
-        notifyDataSetChanged()
-    }
-
     fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?) {
         this.deepLinkList = deepLinkList as ArrayList<DeeplinkModel>
         notifyDataSetChanged()

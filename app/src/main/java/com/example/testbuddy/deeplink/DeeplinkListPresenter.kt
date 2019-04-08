@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.ArrayList
 
 class DeeplinkListPresenter constructor(
     private val delegate: DeeplinkListDelegate,
@@ -44,9 +45,16 @@ class DeeplinkListPresenter constructor(
     }
 
     fun onItemSwiped(position: Int) {
-        viewModel.swipedItemPosition = position
-        viewModel.swipedItem = viewModel.deeplinkList?.get(position)
-        delegate.removeItem(position)
+        if (viewModel.swipedItem != null) {
+            deletePreviousDeepLinkFromDb(position)
+        } else {
+            viewModel.swipedItemPosition = position
+            viewModel.swipedItem = viewModel.deeplinkList?.get(position)
+
+            (viewModel.deeplinkList as? ArrayList)?.removeAt(position)
+            delegate.updateDeepLinkList(viewModel.deeplinkList)
+            delegate.showSnackbar()
+        }
     }
 
     fun onUndoClick() {
@@ -59,6 +67,7 @@ class DeeplinkListPresenter constructor(
     fun onSnackbarDismissed() {
         if (!viewModel.isDeleteUndone) {
             deleteDeepLinkFromDb()
+        } else {
             viewModel.isDeleteUndone = false
         }
     }
@@ -76,7 +85,33 @@ class DeeplinkListPresenter constructor(
             viewModel.deleteDeepLinkCompletable
                 ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe {
+                    viewModel.deleteDeepLinkCompletable = null
+
+                    viewModel.swipedItem = null
                     delegate.showDeepLinkDeleteToast()
+                }
+        }
+    }
+
+    private fun deletePreviousDeepLinkFromDb(currentPosition: Int) {
+        viewModel.swipedItem?.let {
+            if (viewModel.deleteDeepLinkCompletable == null) {
+                viewModel.deleteDeepLinkCompletable = Completable.fromAction {
+                    deepLinkDatabase.deepLinkDao().deleteDeepLink(it)
+                }.subscribeOn(Schedulers.io())
+            }
+
+            viewModel.deleteDeepLinkCompletable
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe {
+                    viewModel.deleteDeepLinkCompletable = null
+
+                    viewModel.swipedItemPosition = currentPosition
+                    viewModel.swipedItem = viewModel.deeplinkList?.get(currentPosition)
+
+                    (viewModel.deeplinkList as? ArrayList)?.removeAt(currentPosition)
+                    delegate.updateDeepLinkList(viewModel.deeplinkList)
+                    delegate.showSnackbar()
                 }
         }
     }

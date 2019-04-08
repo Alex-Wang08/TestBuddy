@@ -104,19 +104,28 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         }
     }
 
-    override fun removeItem(position: Int) {
-        adapter?.apply {
-            removeItem(position)
-            snackBar?.show()
-        }
-    }
-
     override fun restoreItem(position: Int, swipedItem: DeeplinkModel) {
         adapter?.restoreItem(position, swipedItem)
     }
 
     override fun showDeepLinkDeleteToast() {
         Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun dismissSnackbar() {
+        snackBar?.dismiss()
+    }
+
+    override fun showSnackbar() {
+        snackBar?.show()
+    }
+
+    override fun removeSnackbarCallback() {
+        snackBar?.removeCallback(snackBarDismissCallback)
+    }
+
+    override fun addSnackbarCallback() {
+        snackBar?.addCallback(snackBarDismissCallback)
     }
     //endregion
 
