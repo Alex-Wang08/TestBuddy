@@ -14,4 +14,6 @@ interface DeeplinkListDelegate {
 
     fun removeSnackbarCallback()
     fun addSnackbarCallback()
+
+    fun updateSearchText(searchText: String?)
 }

@@ -11,6 +11,7 @@ class DeeplinkViewModel : ViewModel() {
     var swipedItemPosition: Int = 0
     var swipedItem: DeeplinkModel? = null
     var isDeleteUndone = false
+    var searchText: String? = null
 
     var deleteDeepLinkCompletable: Completable? = null
 }

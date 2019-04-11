@@ -36,7 +36,6 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     //region Variables
     private lateinit var presenter: DeeplinkListPresenter
     private var adapter: DeepLinkListAdapter? = null
-    private var suggestionAdapter:
     private var disposable: Disposable? = null
     private var snackBar: Snackbar? = null
     private val snackBarDismissCallback = object : Snackbar.Callback() {
@@ -55,8 +54,10 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            presenter.onSearchTextChanged(s.toString())
         }
     }
+    private var rootView: View? = null
     //endregion
 
     //region Lifecycle
@@ -145,6 +146,11 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     override fun addSnackbarCallback() {
         snackBar?.addCallback(snackBarDismissCallback)
     }
+
+    override fun updateSearchText(searchText: String?) {
+        rootView?.searchBar?.searchEditText?.setText(searchText)
+    }
+
     //endregion
 
     //region BaseController
@@ -153,17 +159,11 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
 
     //region Private Helpers
     private fun initializeSearchBar(searchBar: MaterialSearchBar) {
-        searchBar.setCardViewElevation(10)
-        searchBar.addTextChangeListener()
-
-
-
+        searchBar.apply {
+            setCardViewElevation(10)
+            addTextChangeListener(searchTextWatcher)
+        }
     }
-
-
-
-
-
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, context: Context) {
         adapter = DeepLinkListAdapter(context, this)

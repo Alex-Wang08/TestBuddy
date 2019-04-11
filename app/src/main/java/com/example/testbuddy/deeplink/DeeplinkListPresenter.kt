@@ -71,6 +71,17 @@ class DeeplinkListPresenter constructor(
             viewModel.isDeleteUndone = false
         }
     }
+
+
+    fun onSearchTextChanged(searchText: String?) {
+        viewModel.searchText = searchText
+
+        if (searchText.isNullOrBlank()) {
+            delegate.updateDeepLinkList(viewModel.deeplinkList)
+        } else {
+            updateFilteredDeepLinkList()
+        }
+    }
     //endregion
 
     //region Private Helpers
@@ -117,7 +128,7 @@ class DeeplinkListPresenter constructor(
     }
 
     private fun updateDeepLinkList() {
-        if (viewModel.deeplinkList.isNullOrEmpty()) {
+        if (viewModel.deeplinkList.isNullOrEmpty() && viewModel.searchText.isNullOrBlank()) {
             if (viewModel.getDeepLinkListSingle == null) {
                 viewModel.getDeepLinkListSingle = getDeepLinksFromDb()
             }
@@ -139,8 +150,10 @@ class DeeplinkListPresenter constructor(
                         disposable?.dispose()
                     }
                 )
-        } else {
+        } else if (viewModel.searchText.isNullOrBlank()) {
             delegate.updateDeepLinkList(viewModel.deeplinkList)
+        } else {
+            updateFilteredDeepLinkList()
         }
     }
 
@@ -167,5 +180,13 @@ class DeeplinkListPresenter constructor(
         deepLinkDatabase.deepLinkDao()
             .getDeepLinkList()
             .subscribeOn(Schedulers.io())
+
+
+    private fun updateFilteredDeepLinkList() {
+        viewModel.searchText?.apply {
+            val filteredDeepLinkList = viewModel.deeplinkList?.filter { it.url.contains(this, ignoreCase = true) || it.description?.contains(this) == true }
+            delegate.updateDeepLinkList(filteredDeepLinkList)
+        }
+    }
     //endregion
 }
