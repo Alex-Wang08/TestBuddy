@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +27,7 @@ import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.utils.createClickListenerObservable
 import com.google.android.material.snackbar.Snackbar
+import com.mancj.materialsearchbar.MaterialSearchBar
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
 
@@ -33,11 +36,25 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     //region Variables
     private lateinit var presenter: DeeplinkListPresenter
     private var adapter: DeepLinkListAdapter? = null
+    private var suggestionAdapter:
     private var disposable: Disposable? = null
     private var snackBar: Snackbar? = null
-    private var snackBarDismissCallback = object : Snackbar.Callback() {
+    private val snackBarDismissCallback = object : Snackbar.Callback() {
         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
             presenter.onSnackbarDismissed()
+        }
+    }
+    private val searchTextWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         }
     }
     //endregion
@@ -46,6 +63,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val view = inflater.inflate(R.layout.controller_deeplink_list, container, false)
         view.run {
+            initializeSearchBar(searchBar)
             initializeRecyclerView(deepLinkList, context)
             initializeSnackbar(this as CoordinatorLayout)
             disposable = deepLinkAddDeepLink.createClickListenerObservable().subscribe { presenter.onAddDeepLinkClick() }
@@ -134,6 +152,19 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     //endregion
 
     //region Private Helpers
+    private fun initializeSearchBar(searchBar: MaterialSearchBar) {
+        searchBar.setCardViewElevation(10)
+        searchBar.addTextChangeListener()
+
+
+
+    }
+
+
+
+
+
+
     private fun initializeRecyclerView(recyclerView: RecyclerView, context: Context) {
         adapter = DeepLinkListAdapter(context, this)
         val layoutManager = LinearLayoutManager(context)
