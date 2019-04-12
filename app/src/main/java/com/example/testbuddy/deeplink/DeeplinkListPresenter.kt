@@ -72,7 +72,7 @@ class DeeplinkListPresenter constructor(
         }
     }
 
-
+    // search bar will restore the search text itself and call its text watcher
     fun onSearchTextChanged(searchText: String?) {
         viewModel.searchText = searchText
 
@@ -150,10 +150,6 @@ class DeeplinkListPresenter constructor(
                         disposable?.dispose()
                     }
                 )
-        } else if (viewModel.searchText.isNullOrBlank()) {
-            delegate.updateDeepLinkList(viewModel.deeplinkList)
-        } else {
-            updateFilteredDeepLinkList()
         }
     }
 

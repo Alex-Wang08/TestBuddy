@@ -81,6 +81,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         super.onDestroyView(view)
         disposable?.dispose()
         snackBar?.removeCallback(snackBarDismissCallback)
+        rootView?.searchBar?.searchEditText?.removeTextChangedListener(searchTextWatcher)
         adapter?.onDestroy()
     }
 
@@ -150,7 +151,6 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     override fun updateSearchText(searchText: String?) {
         rootView?.searchBar?.searchEditText?.setText(searchText)
     }
-
     //endregion
 
     //region BaseController
