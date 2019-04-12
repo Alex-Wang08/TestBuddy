@@ -24,6 +24,7 @@ class DeepLinkListAdapter constructor(
     //region Variables
     private var deepLinkList: ArrayList<DeeplinkModel>? = null
     private val compositeDisposable = CompositeDisposable()
+    private var searchText: String? = null
     //endregion
 
     //region ViewHolder
@@ -40,7 +41,7 @@ class DeepLinkListAdapter constructor(
 
     override fun onBindViewHolder(holder: DeepLinkRowViewHolder, position: Int) {
         (holder.itemView as? DeepLinkRow)?.apply {
-            updateDeepLinkInfo(deepLinkList?.get(position))
+            updateDeepLinkInfo(deepLinkList?.get(position), searchText)
             if (position == (deepLinkList?.size ?: 0) - 1) {
                 hideDivider()
             } else {
@@ -53,8 +54,9 @@ class DeepLinkListAdapter constructor(
     //endregion
 
     //region external operations
-    fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?) {
+    fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?, searchText: String? = null) {
         this.deepLinkList = deepLinkList as ArrayList<DeeplinkModel>
+        this.searchText = searchText
         notifyDataSetChanged()
     }
 

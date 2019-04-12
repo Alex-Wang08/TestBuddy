@@ -52,7 +52,7 @@ class DeeplinkListPresenter constructor(
             viewModel.swipedItem = viewModel.deeplinkList?.get(position)
 
             (viewModel.deeplinkList as? ArrayList)?.removeAt(position)
-            delegate.updateDeepLinkList(viewModel.deeplinkList)
+            updateFilteredDeepLinkList()
             delegate.showSnackbar()
         }
     }
@@ -75,12 +75,7 @@ class DeeplinkListPresenter constructor(
     // search bar will restore the search text itself and call its text watcher
     fun onSearchTextChanged(searchText: String?) {
         viewModel.searchText = searchText
-
-        if (searchText.isNullOrBlank()) {
-            delegate.updateDeepLinkList(viewModel.deeplinkList)
-        } else {
-            updateFilteredDeepLinkList()
-        }
+        updateFilteredDeepLinkList()
     }
     //endregion
 
@@ -121,7 +116,7 @@ class DeeplinkListPresenter constructor(
                     viewModel.swipedItem = viewModel.deeplinkList?.get(currentPosition)
 
                     (viewModel.deeplinkList as? ArrayList)?.removeAt(currentPosition)
-                    delegate.updateDeepLinkList(viewModel.deeplinkList)
+                    delegate.updateDeepLinkList(viewModel.deeplinkList, viewModel.searchText)
                     delegate.showSnackbar()
                 }
         }
@@ -163,7 +158,7 @@ class DeeplinkListPresenter constructor(
             ?.subscribe(
                 {
                     viewModel.deeplinkList = it
-                    delegate.updateDeepLinkList(it)
+                    delegate.updateSearchText(null)
                     disposable?.dispose()
                 },
                 {
@@ -179,9 +174,12 @@ class DeeplinkListPresenter constructor(
 
 
     private fun updateFilteredDeepLinkList() {
-        viewModel.searchText?.apply {
-            val filteredDeepLinkList = viewModel.deeplinkList?.filter { it.url.contains(this, ignoreCase = true) || it.description?.contains(this) == true }
-            delegate.updateDeepLinkList(filteredDeepLinkList)
+        val searchText = viewModel.searchText
+        if (searchText.isNullOrBlank()) {
+            delegate.updateDeepLinkList(viewModel.deeplinkList)
+        } else {
+            val filteredDeepLinkList = viewModel.deeplinkList?.filter { it.url.contains(searchText, ignoreCase = true) || it.description?.contains(searchText) == true }
+            delegate.updateDeepLinkList(filteredDeepLinkList, searchText)
         }
     }
     //endregion

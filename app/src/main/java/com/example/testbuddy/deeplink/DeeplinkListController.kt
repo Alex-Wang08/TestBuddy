@@ -62,8 +62,8 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
 
     //region Lifecycle
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val view = inflater.inflate(R.layout.controller_deeplink_list, container, false)
-        view.run {
+        rootView = inflater.inflate(R.layout.controller_deeplink_list, container, false)
+        rootView?.run {
             initializeSearchBar(searchBar)
             initializeRecyclerView(deepLinkList, context)
             initializeSnackbar(this as CoordinatorLayout)
@@ -74,7 +74,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
             presenter = DeeplinkListPresenter(this@DeeplinkListController, DeepLinkDatabase.get(it))
         }
 
-        return view
+        return rootView!!
     }
 
     override fun onDestroyView(view: View) {
@@ -114,8 +114,8 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         }
     }
 
-    override fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?) {
-        adapter?.updateDeepLinkList(deepLinkList)
+    override fun updateDeepLinkList(deepLinkList: List<DeeplinkModel>?, searchText: String?) {
+        adapter?.updateDeepLinkList(deepLinkList, searchText)
     }
 
     override fun openAddDeepLinkActivity(requestCode: Int) {
@@ -149,7 +149,9 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     }
 
     override fun updateSearchText(searchText: String?) {
-        rootView?.searchBar?.searchEditText?.setText(searchText)
+        rootView?.searchBar?.searchEditText?.apply {
+            setText(searchText)
+        }
     }
     //endregion
 
