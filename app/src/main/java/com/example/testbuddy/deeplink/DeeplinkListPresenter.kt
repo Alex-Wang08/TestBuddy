@@ -2,6 +2,7 @@ package com.example.testbuddy.deeplink
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.util.ArrayMap
 import com.example.testbuddy.base.BasePresenter
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
@@ -21,6 +22,7 @@ class DeeplinkListPresenter constructor(
     //region Variables
     private val viewModel: DeeplinkViewModel by lazy { delegate.getViewModel(DeeplinkViewModel::class.java) as DeeplinkViewModel }
     private var disposable: Disposable? = null
+    private val indexMapFromFilteredListToOriginalList = ArrayMap<Int, Int>()
     //endregion
 
     //region Lifecycle
@@ -29,13 +31,17 @@ class DeeplinkListPresenter constructor(
     }
 
     override fun onInitialAttach() {
-        updateDeepLinkList()
+        getDeepLinkListFromDb()
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RequestCode.ADD_DEEP_LINK && resultCode == RESULT_OK) {
             refreshDeepLinkList()
         }
+    }
+
+    fun onDestroy() {
+        onSnackbarDismissed()
     }
     //endregion
 
@@ -45,22 +51,26 @@ class DeeplinkListPresenter constructor(
     }
 
     fun onItemSwiped(position: Int) {
-        if (viewModel.swipedItem != null) {
-            deletePreviousDeepLinkFromDb(position)
-        } else {
-            viewModel.swipedItemPosition = position
-            viewModel.swipedItem = viewModel.deeplinkList?.get(position)
+        val positionInOriginalList = indexMapFromFilteredListToOriginalList[position] ?: 0
 
-            (viewModel.deeplinkList as? ArrayList)?.removeAt(position)
-            updateFilteredDeepLinkList()
+        if (viewModel.swipedItem != null) {
+            deletePreviousDeepLinkFromDb(positionInOriginalList)
+        } else {
+            viewModel.swipedItemPosition = positionInOriginalList
+            viewModel.swipedItem = viewModel.deeplinkList?.get(positionInOriginalList)
+
+            (viewModel.deeplinkList as? ArrayList)?.removeAt(positionInOriginalList)
+            updateDeepLinkList()
             delegate.showSnackbar()
+            viewModel.isSnackbarShowing = true
         }
     }
 
     fun onUndoClick() {
         viewModel.swipedItem?.let {
-            delegate.restoreItem(viewModel.swipedItemPosition, it)
+            (viewModel.deeplinkList as ArrayList).add(viewModel.swipedItemPosition, it)
             viewModel.isDeleteUndone = true
+            updateDeepLinkList()
         }
     }
 
@@ -70,12 +80,13 @@ class DeeplinkListPresenter constructor(
         } else {
             viewModel.isDeleteUndone = false
         }
+        viewModel.isSnackbarShowing = false
     }
 
     // search bar will restore the search text itself and call its text watcher
     fun onSearchTextChanged(searchText: String?) {
         viewModel.searchText = searchText
-        updateFilteredDeepLinkList()
+        updateDeepLinkList()
     }
     //endregion
 
@@ -118,11 +129,12 @@ class DeeplinkListPresenter constructor(
                     (viewModel.deeplinkList as? ArrayList)?.removeAt(currentPosition)
                     delegate.updateDeepLinkList(viewModel.deeplinkList, viewModel.searchText)
                     delegate.showSnackbar()
+                    viewModel.isSnackbarShowing = true
                 }
         }
     }
 
-    private fun updateDeepLinkList() {
+    private fun getDeepLinkListFromDb() {
         if (viewModel.deeplinkList.isNullOrEmpty() && viewModel.searchText.isNullOrBlank()) {
             if (viewModel.getDeepLinkListSingle == null) {
                 viewModel.getDeepLinkListSingle = getDeepLinksFromDb()
@@ -136,7 +148,7 @@ class DeeplinkListPresenter constructor(
                         if (it.isEmpty()) {
                             delegate.openAddDeepLinkActivity(RequestCode.ADD_DEEP_LINK)
                         } else {
-                            delegate.updateDeepLinkList(it)
+                            updateDeepLinkList()
                         }
 
                         disposable?.dispose()
@@ -173,13 +185,20 @@ class DeeplinkListPresenter constructor(
             .subscribeOn(Schedulers.io())
 
 
-    private fun updateFilteredDeepLinkList() {
-        val searchText = viewModel.searchText
-        if (searchText.isNullOrBlank()) {
-            delegate.updateDeepLinkList(viewModel.deeplinkList)
-        } else {
-            val filteredDeepLinkList = viewModel.deeplinkList?.filter { it.url.contains(searchText, ignoreCase = true) || it.description?.contains(searchText) == true }
-            delegate.updateDeepLinkList(filteredDeepLinkList, searchText)
+    private fun updateDeepLinkList() {
+        viewModel.deeplinkList?.apply {
+            val filteredDeepLinkList = this.filter { it.url.contains(viewModel.searchText ?: "", ignoreCase = true) || it.description?.contains(viewModel.searchText ?: "") == true }
+            calculateIndexMap(filteredDeepLinkList, this)
+            delegate.updateDeepLinkList(filteredDeepLinkList, viewModel.searchText)
+        }
+    }
+
+    private fun calculateIndexMap(filteredList: List<DeeplinkModel>, originalList: List<DeeplinkModel>) {
+        indexMapFromFilteredListToOriginalList.clear()
+        filteredList.forEach {
+            if (originalList.contains(it)) {
+                indexMapFromFilteredListToOriginalList[filteredList.indexOf(it)] = originalList.indexOf(it)
+            }
         }
     }
     //endregion

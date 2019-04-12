@@ -12,6 +12,7 @@ class DeeplinkViewModel : ViewModel() {
     var swipedItem: DeeplinkModel? = null
     var isDeleteUndone = false
     var searchText: String? = null
+    var isSnackbarShowing = false
 
     var deleteDeepLinkCompletable: Completable? = null
 }

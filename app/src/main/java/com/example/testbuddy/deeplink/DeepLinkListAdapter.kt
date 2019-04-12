@@ -60,11 +60,6 @@ class DeepLinkListAdapter constructor(
         notifyDataSetChanged()
     }
 
-    fun restoreItem(position: Int, swipedItem: DeeplinkModel) {
-        deepLinkList?.add(position, swipedItem)
-        notifyDataSetChanged()
-    }
-
     fun onDestroy() {
         compositeDisposable.dispose()
         listener = null

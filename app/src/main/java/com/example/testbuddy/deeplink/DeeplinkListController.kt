@@ -27,6 +27,7 @@ import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.utils.createClickListenerObservable
 import com.google.android.material.snackbar.Snackbar
+import com.jakewharton.rxbinding3.material.dismisses
 import com.mancj.materialsearchbar.MaterialSearchBar
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
@@ -79,6 +80,8 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
 
     override fun onDestroyView(view: View) {
         super.onDestroyView(view)
+        presenter.onDestroy()
+
         disposable?.dispose()
         snackBar?.removeCallback(snackBarDismissCallback)
         rootView?.searchBar?.searchEditText?.removeTextChangedListener(searchTextWatcher)
@@ -122,10 +125,6 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         activity?.let {
             startActivityForResult(AddDeepLinkActivity.createIntent(it), requestCode)
         }
-    }
-
-    override fun restoreItem(position: Int, swipedItem: DeeplinkModel) {
-        adapter?.restoreItem(position, swipedItem)
     }
 
     override fun showDeepLinkDeleteToast() {
