@@ -75,10 +75,12 @@ class DeeplinkListPresenter constructor(
     }
 
     fun onSnackbarDismissed() {
-        if (!viewModel.isDeleteUndone) {
-            deleteDeepLinkFromDb()
-        } else {
-            viewModel.isDeleteUndone = false
+        if (viewModel.isSnackbarShowing) {
+            if (!viewModel.isDeleteUndone) {
+                deleteDeepLinkFromDb()
+            } else {
+                viewModel.isDeleteUndone = false
+            }
         }
         viewModel.isSnackbarShowing = false
     }
