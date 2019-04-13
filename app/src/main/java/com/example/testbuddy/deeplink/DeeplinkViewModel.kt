@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.util.ArrayList
 
 class DeeplinkViewModel : ViewModel() {
-    var deeplinkList: List<DeeplinkModel>? = null
+    var deeplinkList: ArrayList<DeeplinkModel>? = null
     var getDeepLinkListSingle: Single<List<DeeplinkModel>>? = null
     var swipedItemPosition: Int = 0
     var swipedItem: DeeplinkModel? = null

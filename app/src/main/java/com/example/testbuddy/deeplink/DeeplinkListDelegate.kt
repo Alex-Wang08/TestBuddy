@@ -12,6 +12,7 @@ interface DeeplinkListDelegate {
     fun showSnackbar()
     fun removeSnackbarCallback()
     fun addSnackbarCallback()
-
+    fun removeItem(position: Int)
     fun updateSearchText(searchText: String?)
+    fun restoreItem(position: Int, deeplinkModel: DeeplinkModel)
 }

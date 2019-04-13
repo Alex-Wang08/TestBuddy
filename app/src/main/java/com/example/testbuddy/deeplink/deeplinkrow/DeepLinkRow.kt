@@ -1,38 +1,27 @@
 package com.example.testbuddy.deeplink.deeplinkrow
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import com.example.testbuddy.R
 import com.example.testbuddy.deeplink.db.DeeplinkModel
-import com.example.testbuddy.utils.createClickListenerObservable
-import com.example.testbuddy.utils.goneView
-import com.example.testbuddy.utils.visibleView
-import io.reactivex.disposables.Disposable
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.style.TextAppearanceSpan
+import android.widget.FrameLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.component_deep_link_row.view.*
-
 
 class DeepLinkRow @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyle: Int = 0
-) : LinearLayout(context, attributeSet, defStyle), LifecycleObserver {
+) : FrameLayout(context, attributeSet, defStyle), LifecycleObserver {
 
     //region Init
     init {
@@ -63,14 +52,6 @@ class DeepLinkRow @JvmOverloads constructor(
                 textView.text = text
             }
         }
-    }
-
-    fun hideDivider() {
-        deepLinkDivider.goneView()
-    }
-
-    fun showDivider() {
-        deepLinkDivider.visibleView()
     }
     //endregion
 }

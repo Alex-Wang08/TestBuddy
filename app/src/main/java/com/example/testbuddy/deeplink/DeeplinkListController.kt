@@ -151,6 +151,14 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
             setText(searchText)
         }
     }
+
+    override fun removeItem(position: Int) {
+        adapter?.removeItem(position)
+    }
+
+    override fun restoreItem(position: Int, deeplinkModel: DeeplinkModel) {
+        adapter?.restoreItem(position, deeplinkModel)
+    }
     //endregion
 
     //region BaseController

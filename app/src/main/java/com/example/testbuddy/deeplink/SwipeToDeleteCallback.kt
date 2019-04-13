@@ -3,6 +3,7 @@ package com.example.testbuddy.deeplink
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +43,7 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.Callbac
         isCurrentlyActive: Boolean
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        val itemView = viewHolder.itemView
+        val itemView = viewHolder.itemView.findViewById<CardView>(R.id.deepLinkCard)
         val isCancelled = dX == 0f && !isCurrentlyActive
         if (isCancelled) {
             clearCanvas(c, itemView.right + dX, itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())

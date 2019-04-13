@@ -42,12 +42,6 @@ class DeepLinkListAdapter constructor(
     override fun onBindViewHolder(holder: DeepLinkRowViewHolder, position: Int) {
         (holder.itemView as? DeepLinkRow)?.apply {
             updateDeepLinkInfo(deepLinkList?.get(position), searchText)
-            if (position == (deepLinkList?.size ?: 0) - 1) {
-                hideDivider()
-            } else {
-                showDivider()
-            }
-
             createClickListenerObservable().subscribe { listener?.onDeepLinkRowClick(deepLinkList?.get(position)?.url) }.addTo(compositeDisposable)
         }
     }
@@ -58,6 +52,16 @@ class DeepLinkListAdapter constructor(
         this.deepLinkList = deepLinkList as ArrayList<DeeplinkModel>
         this.searchText = searchText
         notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        deepLinkList?.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun restoreItem(position: Int, deeplinkModel: DeeplinkModel) {
+        deepLinkList?.add(position, deeplinkModel)
+        notifyItemInserted(position)
     }
 
     fun onDestroy() {
