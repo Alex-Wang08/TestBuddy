@@ -1,19 +1,22 @@
 package com.example.testbuddy.deeplink
 
-import android.drm.DrmRights
+import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.testbuddy.R
 
-abstract class SwipeToDeleteCallback : ItemTouchHelper.Callback() {
+abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.Callback() {
 
     //region Variables
-    private val clearPaint = Paint().apply {
-        xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-    }
+    private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
     private val background = ColorDrawable()
-
+    private val backgroundColor = ContextCompat.getColor(context, R.color.swipe_bg_color)
+    private val deleteDrawable = ContextCompat.getDrawable(context, R.drawable.ic_delete)
+    private val intrinsicWidth = deleteDrawable?.intrinsicWidth ?: 0
+    private val intrinsicHeight = deleteDrawable?.intrinsicHeight ?: 0
     //endregion
 
 
@@ -40,25 +43,30 @@ abstract class SwipeToDeleteCallback : ItemTouchHelper.Callback() {
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         val itemView = viewHolder.itemView
-        val itemHeight = itemView.height
-
         val isCancelled = dX == 0f && !isCurrentlyActive
-//        if (isCancelled) {
-//        } else {
-//            background.apply {
-//                color = Color.parseColor("#b80f0a")
-//                setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
-//                draw(c)
-//            }
-//
-//
-//
-//
-//        }
-        clearCanvas(c, itemView.right + dX, itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
+        if (isCancelled) {
+            clearCanvas(c, itemView.right + dX, itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
+        } else {
+            background.apply {
+                color = backgroundColor
+                setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                draw(c)
+            }
+
+            val deleteIconMargin = (itemView.height - intrinsicHeight) / 2
+            val deleteIconTop = itemView.top + (itemView.height - intrinsicHeight) / 2
+            val deleteIconLeft = itemView.right - deleteIconMargin - intrinsicWidth
+            val deleteIconRight = itemView.right - deleteIconMargin
+            val deleteIconBottom = deleteIconTop + intrinsicHeight
+
+            deleteDrawable?.apply {
+                setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+                draw(c)
+            }
+        }
+
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
-
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         return 0.7f

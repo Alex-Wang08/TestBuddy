@@ -27,7 +27,6 @@ import com.example.testbuddy.deeplink.db.DeepLinkDatabase
 import com.example.testbuddy.deeplink.db.DeeplinkModel
 import com.example.testbuddy.utils.createClickListenerObservable
 import com.google.android.material.snackbar.Snackbar
-import com.jakewharton.rxbinding3.material.dismisses
 import com.mancj.materialsearchbar.MaterialSearchBar
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.controller_deeplink_list.view.*
@@ -128,7 +127,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
     }
 
     override fun showDeepLinkDeleteToast() {
-        Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, applicationContext?.getString(R.string.label_delete), Toast.LENGTH_SHORT).show()
     }
 
     override fun dismissSnackbar() {
@@ -172,17 +171,20 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
 
-        val swipeToDeleteCallback = createSwipeToDeleteCallback()
-        ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
+        activity?.let {
+            val swipeToDeleteCallback = createSwipeToDeleteCallback(it)
+            ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
+        }
+
     }
 
     private fun initializeSnackbar(coordinatorLayout: CoordinatorLayout) {
         snackBar = Snackbar.make(
             coordinatorLayout,
-            "Item was removed from the list.",
+            applicationContext?.getString(R.string.label_item_removed) ?: "",
             Snackbar.LENGTH_LONG
         ).apply {
-            setAction("UNDO") {
+            setAction(context.getString(R.string.label_undo)) {
                 presenter.onUndoClick()
             }
             setActionTextColor(Color.YELLOW)
@@ -191,7 +193,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
         snackBar?.addCallback(snackBarDismissCallback)
     }
 
-    private fun createSwipeToDeleteCallback(): SwipeToDeleteCallback = object : SwipeToDeleteCallback() {
+    private fun createSwipeToDeleteCallback(context: Context): SwipeToDeleteCallback = object : SwipeToDeleteCallback(context) {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             presenter.onItemSwiped(viewHolder.adapterPosition)
         }

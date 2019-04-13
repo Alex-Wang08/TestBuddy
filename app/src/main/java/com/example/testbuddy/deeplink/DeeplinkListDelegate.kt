@@ -2,7 +2,6 @@ package com.example.testbuddy.deeplink
 
 import androidx.lifecycle.ViewModel
 import com.example.testbuddy.deeplink.db.DeeplinkModel
-import java.util.logging.Filter
 
 interface DeeplinkListDelegate {
     fun <T : ViewModel> getViewModel(clazz: Class<T>): ViewModel

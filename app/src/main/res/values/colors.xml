@@ -11,5 +11,5 @@
 
     <color name="red_secondary">#d92d19</color>
     <color name="red_primary">#ee5340</color>
-
+    <color name="swipe_bg_color">#b80f0a</color>
 </resources>
