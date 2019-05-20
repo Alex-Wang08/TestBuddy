@@ -15,4 +15,6 @@ interface DeeplinkListDelegate {
     fun removeItem(position: Int)
     fun updateSearchText(searchText: String?)
     fun restoreItem(position: Int, deeplinkModel: DeeplinkModel)
+    fun showNoDeepLinkToast(toast: String)
+    fun openDeepLinkActivity(url: String?)
 }

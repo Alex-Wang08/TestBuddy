@@ -89,18 +89,13 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        presenter.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode)
     }
     //endregion
 
     //region Listener
     override fun onDeepLinkRowClick(url: String?) {
-        activity?.let {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(url)
-            }
-            startActivity(intent)
-        }
+        presenter.onDeepLinkRowClick(url)
     }
     //endregion
 
@@ -158,6 +153,22 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate, DeepLinkL
 
     override fun restoreItem(position: Int, deeplinkModel: DeeplinkModel) {
         adapter?.restoreItem(position, deeplinkModel)
+    }
+
+
+    override fun showNoDeepLinkToast(toast: String) {
+        activity?.let {
+            Toast.makeText(it, toast, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun openDeepLinkActivity(url: String?) {
+        activity?.let {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(url)
+            }
+            startActivity(intent)
+        }
     }
     //endregion
 

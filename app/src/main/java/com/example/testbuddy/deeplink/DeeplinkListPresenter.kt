@@ -1,6 +1,7 @@
 package com.example.testbuddy.deeplink
 
 import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.util.ArrayMap
 import com.example.testbuddy.base.BasePresenter
@@ -35,7 +36,7 @@ class DeeplinkListPresenter constructor(
         getDeepLinkListFromDb()
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun onActivityResult(requestCode: Int, resultCode: Int) {
         if (requestCode == RequestCode.ADD_DEEP_LINK && resultCode == RESULT_OK) {
             refreshDeepLinkList()
         }
@@ -79,6 +80,14 @@ class DeeplinkListPresenter constructor(
             }
         }
         viewModel.isSnackbarShowing = false
+    }
+
+    fun onDeepLinkRowClick(url: String?) {
+        try {
+            delegate.openDeepLinkActivity(url)
+        } catch (e: ActivityNotFoundException) {
+            delegate.showNoDeepLinkToast(e.message ?: "")
+        }
     }
 
     // search bar will restore the search text itself and call its text watcher
