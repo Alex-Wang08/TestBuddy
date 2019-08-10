@@ -16,6 +16,7 @@ import android.text.style.TextAppearanceSpan
 import android.widget.FrameLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.component_deep_link_row.view.*
+import java.util.*
 
 class DeepLinkRow @JvmOverloads constructor(
     context: Context,
@@ -40,7 +41,7 @@ class DeepLinkRow @JvmOverloads constructor(
         if (filter.isNullOrBlank()) {
             textView.text = text
         } else {
-            val startPosition = text?.toLowerCase()?.indexOf(filter.toLowerCase()) ?: -1
+            val startPosition = text?.toLowerCase(Locale.US)?.indexOf(filter.toLowerCase(Locale.US)) ?: -1
             val endPosition = startPosition + filter.length
             if (startPosition != -1) {
                 val spannable = SpannableString(text)

@@ -2,7 +2,6 @@ package com.example.testbuddy.deeplink
 
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.util.ArrayMap
 import com.example.testbuddy.base.BasePresenter
 import com.example.testbuddy.deeplink.db.DeepLinkDatabase

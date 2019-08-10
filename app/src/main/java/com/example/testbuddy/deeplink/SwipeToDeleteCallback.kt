@@ -20,10 +20,9 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.Callbac
     private val intrinsicHeight = deleteDrawable?.intrinsicHeight ?: 0
     //endregion
 
-
+    //region Implements
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         return makeMovementFlags(0, ItemTouchHelper.LEFT)
-
     }
 
     override fun onMove(
@@ -31,8 +30,9 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.Callbac
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean = false
+    //endregion
 
-
+    //region Overrides
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
@@ -72,6 +72,7 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.Callbac
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         return 0.7f
     }
+    //endregion
 
     //region Private Helpers
     private fun clearCanvas(

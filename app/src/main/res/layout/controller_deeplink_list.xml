@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             app:mt_placeholder="Search Deep Link"
             app:mt_hint="Enter Deep Link"
-            android:elevation="4dp"/>
+            android:elevation="8dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/deepLinkList"
