@@ -14,7 +14,7 @@ import java.util.*
 class AddDeepLinkPresenter(
     private val delegate: AddDeepLinkDelegate,
     private val database: DeepLinkDatabase,
-    private val lifecycleOwner: LifecycleOwner
+    lifecycleOwner: LifecycleOwner
 ) : LifecycleObserver {
 
     //region Variables
@@ -31,17 +31,6 @@ class AddDeepLinkPresenter(
         initializeUrlText()
         initializeDescriptionText()
     }
-
-    private fun initializeUrlText() {
-        if (viewModel.deepLinkUrl.isNullOrEmpty()) return
-        delegate.updateUrlText(viewModel.deepLinkUrl)
-    }
-
-    private fun initializeDescriptionText() {
-        if (viewModel.deepLinkDescription.isNullOrEmpty()) return
-        delegate.updateDescriptionText(viewModel.deepLinkDescription)
-    }
-
     //endregion
 
     //region Listener
@@ -97,6 +86,16 @@ class AddDeepLinkPresenter(
 
                 }
         }
+    }
+
+    private fun initializeUrlText() {
+        if (viewModel.deepLinkUrl.isNullOrEmpty()) return
+        delegate.updateUrlText(viewModel.deepLinkUrl)
+    }
+
+    private fun initializeDescriptionText() {
+        if (viewModel.deepLinkDescription.isNullOrEmpty()) return
+        delegate.updateDescriptionText(viewModel.deepLinkDescription)
     }
     //endregion
 }
