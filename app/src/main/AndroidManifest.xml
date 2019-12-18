@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.testbuddy">
+    package="com.alex.testbuddy">
 
     <application
         android:allowBackup="true"
@@ -22,7 +21,9 @@
 
         <activity
             android:name=".deeplink.adddeeplink.AddDeepLinkActivity"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize"
+        />
 
     </application>
 
