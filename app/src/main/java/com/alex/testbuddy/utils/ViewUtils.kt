@@ -1,7 +1,6 @@
 package com.alex.testbuddy.utils
 
 import android.view.View
-import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding3.view.clicks
 import io.reactivex.Observable
 import java.util.concurrent.TimeUnit

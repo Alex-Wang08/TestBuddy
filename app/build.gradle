@@ -7,13 +7,20 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion computeCompileSdkVersion()
+    Integer valueForMobileApp = 1
+
     defaultConfig {
         applicationId "com.alex.testbuddy"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion computeMinSdkVersion()
+        targetSdkVersion computeTargetSdkVersion()
+
+        Integer buildNumb = System.getenv("VERSION_BUILD_NUMBER") as Integer ?: computeVersionCode()
+        versionCode Integer.parseInt(buildNumb.toString() + valueForMobileApp)
+
+        String buildName = System.getenv("VERSION_BUILD_NAME") as String ?: computeVersionName()
+        versionName buildName
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

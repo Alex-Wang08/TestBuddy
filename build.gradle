@@ -28,3 +28,23 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+static def computeVersionCode() {
+    return 202310241
+}
+
+static def computeVersionName() {
+    return "1.0.1"
+}
+
+static def computeCompileSdkVersion() {
+    return 33
+}
+
+static def computeTargetSdkVersion() {
+    return 33
+}
+
+static def computeMinSdkVersion() {
+    return 23
+}
