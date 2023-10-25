@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.FragmentActivity
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.alex.testbuddy.MyApplication
 import com.alex.testbuddy.R
 import com.alex.testbuddy.base.BaseController
 import com.alex.testbuddy.base.BasePresenter
@@ -26,6 +28,7 @@ import com.alex.testbuddy.deeplink.adddeeplink.AddDeepLinkActivity
 import com.alex.testbuddy.deeplink.db.DeepLinkDatabase
 import com.alex.testbuddy.deeplink.db.DeeplinkModel
 import com.alex.testbuddy.utils.createClickListenerObservable
+import com.alex.testbuddy.utils.getAppVersion
 import com.google.android.material.snackbar.Snackbar
 import com.mancj.materialsearchbar.MaterialSearchBar
 import io.reactivex.disposables.Disposable
@@ -70,6 +73,7 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate,
             initializeSnackbar(this as CoordinatorLayout)
             disposable = deepLinkAddDeepLink.createClickListenerObservable()
                 .subscribe { presenter.onAddDeepLinkClick() }
+            initializeVersionInfo(versionInfo)
         }
 
         applicationContext?.let {
@@ -200,7 +204,18 @@ class DeeplinkListController : BaseController(), DeeplinkListDelegate,
             val swipeToDeleteCallback = createSwipeToDeleteCallback(it)
             ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(recyclerView)
         }
+    }
 
+    private fun initializeVersionInfo(versionInfo: TextView) {
+        applicationContext?.let {
+            versionInfo.text = try {
+                val packageInfo = it.packageManager.getPackageInfo(it.packageName, 0)
+                "${packageInfo.versionName} (${packageInfo.versionCode})"
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+        }
     }
 
     private fun initializeSnackbar(coordinatorLayout: CoordinatorLayout) {
