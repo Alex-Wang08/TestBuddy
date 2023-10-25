@@ -30,11 +30,11 @@ task clean(type: Delete) {
 }
 
 static def computeVersionCode() {
-    return 202201211
+    return 202310241
 }
 
 static def computeVersionName() {
-    return "1.0.18"
+    return "1.0.1"
 }
 
 static def computeCompileSdkVersion() {
